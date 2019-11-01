@@ -373,7 +373,8 @@ riscv_hello:
 	CFLAGS="-march=$(RISCV_CORE_ARCH)" riscv64-unknown-elf-gcc -o hello hello.c && \
 	cp hello $(final_output_dir)/riscv/
 
-RISCVLinuxVersion = 4.1.17
+#<<JC>>RISCVLinuxVersion = 4.1.17 # Hit error complaining unrecognized command line option '-msoft-float' '-m64' etc
+RISCVLinuxVersion = 4.18.2
 
 riscv_linux: riscv_fesvr riscv_bbl riscv_kernel
 
@@ -385,14 +386,19 @@ riscv_kernel:
 	git submodule update --init  -- ${BOOT}/riscv-linux
 	cd ${BOOT} && \
 	curl -L https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-$(RISCVLinuxVersion).tar.xz | tar -xJkf - && \
-	rsync -a --ignore-existing linux-$(RISCVLinuxVersion)/ riscv-linux/ && \
+	rsync -a linux-$(RISCVLinuxVersion)/ riscv-linux/ && \
 	rm -rf linux-$(RISCVLinuxVersion) && \
 	cd riscv-linux && \
 	sed -i "s/^\(CONFIG_CMDLINE=\"root=\/dev\/htifblk0\)\"/\1 mem=$(RISCV_DRAM_SIZE_LINUX)\"/" arch/riscv/configs/riscv64_spike && \
-	make ARCH=riscv defconfig && \
-	make -j${JOBS} ARCH=riscv vmlinux && \
+	make ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- defconfig && \
+	make -j${JOBS} ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- vmlinux && \
 	cp vmlinux $(final_output_dir)/riscv/
 
+	#<<JC>> git remote add origin https://github.com/riscv/riscv-linux.git && \
+	#<<JC>> cd ${BOOT}/riscv-linux && \
+	#<<JC>> git fetch && git checkout -f -t origin/riscv-linux-4.18 && \
+
+	#<<JC>> rsync -a --ignore-existing linux-$(RISCVLinuxVersion)/ riscv-linux/ && \
 #
 # ---------------------
 # Handle ramdisk images

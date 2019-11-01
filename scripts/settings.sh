@@ -1,10 +1,10 @@
 #!/bin/bash
 
-BOARD=zedboard
+BOARD=parallella
 export BOARD
 echo "\$BOARD set to ${BOARD}"
 
-JOBS=16
+JOBS=8
 export JOBS
 echo "\$JOBS set to ${JOBS}"
 

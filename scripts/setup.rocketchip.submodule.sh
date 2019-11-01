@@ -10,5 +10,5 @@ git submodule update --init  -- ${TESTCHIPIP}
 
 # Initialize the Rocket Chip submodule submodules (!)
 cd ${ROCKETCHIP}
-git submodule update --init
+git submodule update --init --recursive
 
